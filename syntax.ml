@@ -15,9 +15,12 @@ type expr =
   | EEq        of expr * expr
   | ELt        of expr * expr
   | EIf        of expr * expr * expr
+  | ELet       of name * expr * expr
+
 
 type command =
-  | CExp of expr
+  | CExp  of expr
+  | CDecl of name * expr
 
 let print_name = print_string
 
@@ -84,7 +87,19 @@ let rec print_expr e =
       print_string ",";
       print_expr   e3;
       print_string ")")
+  | ELet (e1,e2,e3) ->
+     (print_string "ELet (";
+      print_name   e1;
+      print_string ",";
+      print_expr   e2;
+      print_string ",";
+      print_expr   e3;
+      print_string ")")
 
 let rec print_command p =
   match p with
   | CExp e -> print_expr e
+  | CDecl (e1,e2) -> (print_string "val ";
+                      print_name e1;
+                      print_string ":";
+                      print_expr e2)

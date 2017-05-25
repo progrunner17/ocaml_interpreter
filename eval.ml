@@ -65,7 +65,11 @@ let rec eval_expr env e =
      | VBool b ->
        if b then eval_expr env e2 else eval_expr env e3
      | _ -> raise EvalErr)
+  | ELet (e1,e2,e3) ->
+    (eval_expr ((e1,(eval_expr env e2))::env)  e3)
 
 let rec eval_command env c =
   match c with
   | CExp e -> ("-", env, eval_expr env e)
+  | CDecl (e1,e2) -> (e1,((e1,(eval_expr env e2))::env),(eval_expr env e2))
+

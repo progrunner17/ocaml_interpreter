@@ -11,6 +11,8 @@ rule main = parse
 | "/"          { Parser.DIV }
 | "="          { Parser.EQ }
 | "<"          { Parser.LT }
+| "let"        { Parser.LET }
+| "in"         { Parser.IN }
 | "if"         { Parser.IF }
 | "then"       { Parser.THEN }
 | "else"       { Parser.ELSE }

@@ -6,6 +6,7 @@
 %token <int>    INT
 %token <bool>   BOOL
 %token <string> ID
+%token LET IN
 %token PLUS MINUS TIMES DIV
 %token EQ LT
 %token IF THEN ELSE
@@ -18,9 +19,12 @@
 
 toplevel:
   | expr SEMISEMI { CExp $1 }
+  | LET var EQ expr SEMISEMI { CDecl ($2, $4) }
+
 ;
 
 expr:
+  | LET var EQ expr IN expr     { ELet($2,$4,$6) }
   | IF expr THEN expr ELSE expr { EIf($2,$4,$6) }
   | arith_expr EQ arith_expr    { EEq($1,$3) }
   | arith_expr LT arith_expr    { ELt($1,$3) }
@@ -44,6 +48,10 @@ atomic_expr:
   | BOOL           { EConstBool($1) }
   | ID             { EVar($1) }
   | LPAR expr RPAR { $2 }
+;
+
+var:
+  | ID { $1 }
 ;
 
 
