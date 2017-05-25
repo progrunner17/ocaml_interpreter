@@ -6,6 +6,9 @@ let ident = alpha (alpha | digit)*
 rule main = parse
 | space+       { main lexbuf }
 | "+"          { Parser.PLUS }
+| "*"          { Parser.TIMES }
+| "-"          { Parser.MINUS }
+| "/"          { Parser.DIV }
 | "="          { Parser.EQ }
 | "<"          { Parser.LT }
 | "if"         { Parser.IF }

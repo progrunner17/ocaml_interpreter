@@ -9,6 +9,9 @@ type expr =
   | EConstBool of bool
   | EVar       of name
   | EAdd       of expr * expr
+  | ESub       of expr * expr
+  | EMul       of expr * expr
+  | EDiv       of expr * expr
   | EEq        of expr * expr
   | ELt        of expr * expr
   | EIf        of expr * expr * expr
@@ -39,6 +42,24 @@ let rec print_expr e =
      print_name x
   | EAdd (e1,e2) ->
      (print_string "EAdd (";
+      print_expr e1;
+      print_string ",";
+      print_expr e2;
+      print_string ")")
+  | ESub (e1,e2) ->
+     (print_string "ESub (";
+      print_expr e1;
+      print_string ",";
+      print_expr e2;
+      print_string ")")
+  | EMul (e1,e2) ->
+     (print_string "EMul (";
+      print_expr e1;
+      print_string ",";
+      print_expr e2;
+      print_string ")")
+  | EDiv (e1,e2) ->
+     (print_string "EDiv (";
       print_expr e1;
       print_string ",";
       print_expr e2;

@@ -6,7 +6,7 @@
 %token <int>    INT
 %token <bool>   BOOL
 %token <string> ID
-%token PLUS
+%token PLUS MINUS TIMES DIV
 %token EQ LT
 %token IF THEN ELSE
 %token LPAR RPAR
@@ -28,12 +28,15 @@ expr:
 ;
 
 arith_expr:
-  | arith_expr PLUS factor_expr { EAdd($1,$3) }
-  | factor_expr                 { $1 }
+  | arith_expr PLUS factor_expr  { EAdd($1,$3) }
+  | arith_expr MINUS factor_expr { ESub($1,$3) }
+  | factor_expr                  { $1 }
 ;
 
 factor_expr:
-  | atomic_expr                 { $1 }
+  | factor_expr TIMES atomic_expr { EMul($1,$3) }
+  | factor_expr DIV atomic_expr   { EDiv($1,$3) }
+  | atomic_expr                   { $1 }
 ;
 
 atomic_expr:
