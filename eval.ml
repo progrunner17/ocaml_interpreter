@@ -47,6 +47,18 @@ let rec eval_expr env e =
     (match v1, v2 with
      | VInt i1, VInt i2 -> VInt (i1 / i2)
      | _ -> raise EvalErr)
+  | EAnd (e1,e2) ->
+    let v1 = eval_expr env e1 in
+    let v2 = eval_expr env e2 in
+    (match v1, v2 with
+     | VBool i1, VBool i2 -> VBool (i1 && i2)
+     | _ -> raise EvalErr)
+  | EOr (e1,e2) ->
+    let v1 = eval_expr env e1 in
+    let v2 = eval_expr env e2 in
+    (match v1, v2 with
+     | VBool i1, VBool i2 -> VBool (i1 || i2)
+     | _ -> raise EvalErr)
   | EEq (e1,e2) ->
     let v1 = eval_expr env e1 in
     let v2 = eval_expr env e2 in

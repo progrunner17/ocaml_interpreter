@@ -9,6 +9,8 @@ rule main = parse
 | "*"          { Parser.TIMES }
 | "-"          { Parser.MINUS }
 | "/"          { Parser.DIV }
+| "&&"         { Parser.AND }
+| "||"         { Parser.OR }
 | "="          { Parser.EQ }
 | "<"          { Parser.LT }
 | "let"        { Parser.LET }

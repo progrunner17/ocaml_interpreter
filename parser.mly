@@ -8,6 +8,7 @@
 %token <string> ID
 %token LET IN
 %token PLUS MINUS TIMES DIV
+%token AND OR
 %token EQ LT
 %token IF THEN ELSE
 %token LPAR RPAR
@@ -26,11 +27,25 @@ toplevel:
 expr:
   | LET var EQ expr IN expr     { ELet($2,$4,$6) }
   | IF expr THEN expr ELSE expr { EIf($2,$4,$6) }
+  | bool_expr                  { $1 }
+;
+
+
+bool_expr:
+  | bool_noor_expr OR bool_expr    { EOr($1,$3) }
+  | bool_noor_expr                 { $1 }
+;
+
+bool_noor_expr:
+  | bool_factor_expr AND bool_noor_expr   { EAnd($1,$3) }
+  | bool_factor_expr                 { $1 }
+;
+
+bool_factor_expr:
   | arith_expr EQ arith_expr    { EEq($1,$3) }
   | arith_expr LT arith_expr    { ELt($1,$3) }
   | arith_expr                  { $1 }
 ;
-
 arith_expr:
   | arith_expr PLUS factor_expr  { EAdd($1,$3) }
   | arith_expr MINUS factor_expr { ESub($1,$3) }

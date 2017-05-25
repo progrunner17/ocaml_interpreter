@@ -12,6 +12,8 @@ type expr =
   | ESub       of expr * expr
   | EMul       of expr * expr
   | EDiv       of expr * expr
+  | EAnd       of expr * expr
+  | EOr        of expr * expr
   | EEq        of expr * expr
   | ELt        of expr * expr
   | EIf        of expr * expr * expr
@@ -63,6 +65,18 @@ let rec print_expr e =
       print_string ")")
   | EDiv (e1,e2) ->
      (print_string "EDiv (";
+      print_expr e1;
+      print_string ",";
+      print_expr e2;
+      print_string ")")
+  | EAnd (e1,e2) ->
+     (print_string "EAnd (";
+      print_expr e1;
+      print_string ",";
+      print_expr e2;
+      print_string ")")
+  | EOr (e1,e2) ->
+     (print_string "EOr (";
       print_expr e1;
       print_string ",";
       print_expr e2;
