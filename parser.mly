@@ -29,6 +29,7 @@ let_expr:
   | var EQ expr SEMISEMI      { CDecl ($1, $3) }
 ;
 
+;
 expr:
   | LET var EQ expr IN expr     { ELet($2,$4,$6) }
   | IF expr THEN expr ELSE expr { EIf($2,$4,$6) }
@@ -37,18 +38,18 @@ expr:
 
 
 bool_expr:
-  | bool_noor_expr OR bool_expr    { EOr($1,$3) }
-  | bool_noor_expr                 { $1 }
+  | bool_or_expr OR bool_expr    { EOr($1,$3) }
+  | bool_or_expr                 { $1 }
 ;
 
-bool_noor_expr:
-  | bool_factor_expr AND bool_noor_expr   { EAnd($1,$3) }
+bool_or_expr:
+  | bool_factor_expr AND bool_or_expr   { EAnd($1,$3) }
   | bool_factor_expr                 { $1 }
 ;
 
 bool_factor_expr:
-  | arith_expr EQ arith_expr    { EEq($1,$3) }
-  | arith_expr LT arith_expr    { ELt($1,$3) }
+  | bool_factor_expr EQ arith_expr    { EEq($1,$3) }
+  | bool_factor_expr LT arith_expr    { ELt($1,$3) }
   | arith_expr                  { $1 }
 ;
 arith_expr:
