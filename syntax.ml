@@ -24,6 +24,7 @@ type command =
   | CExp  of expr
   | CDecl of name * expr
   | CMultiDecl of name * expr * command
+  | CAndDecl of name * expr * command
 
 let print_name = print_string
 
@@ -119,6 +120,11 @@ let rec print_command p =
                       print_string ":";
                       print_expr e2)
   | CMultiDecl (e1,e2,e3) -> (print_string "val ";
+                      print_name e1;
+                      print_string ":";
+                      print_expr e2;
+                      print_command e3)
+  | CAndDecl (e1,e2,e3) -> (print_string "val ";
                       print_name e1;
                       print_string ":";
                       print_expr e2;
