@@ -84,4 +84,8 @@ let rec eval_command env c =
   match c with
   | CExp e -> ("-", env, eval_expr env e)
   | CDecl (e1,e2) -> (e1,((e1,(eval_expr env e2))::env),(eval_expr env e2))
+  | CMultiDecl(x,e,next) -> Printf.printf "%s = " x;
+                            print_value (eval_expr env e);
+                            print_newline ();
+                         let v = eval_expr env e in eval_command (extend x v env) next
 

@@ -21,7 +21,12 @@
 toplevel:
   | expr SEMISEMI { CExp $1 }
   | LET var EQ expr SEMISEMI { CDecl ($2, $4) }
+  | LET var EQ expr LET let_expr { CMultiDecl($2,$4,$6) }
+;
 
+let_expr:
+  | var EQ expr LET let_expr  { CMultiDecl($1,$3,$5) }
+  | var EQ expr SEMISEMI      { CDecl ($1, $3) }
 ;
 
 expr:
