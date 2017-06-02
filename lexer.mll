@@ -23,6 +23,8 @@ rule main = parse
 | "false"      { Parser.BOOL (false) }
 | "("          { Parser.LPAR }
 | ")"          { Parser.RPAR }
+| "fun"        { Parser.FUN}
+| "->"         { Parser.ARROW }
 | ";;"         { Parser.SEMISEMI }
 | digit+ as n  { Parser.INT (int_of_string n) }
 | ident  as id { Parser.ID id }

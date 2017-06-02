@@ -2,8 +2,8 @@ open Syntax
 
 exception Unbound
 
-type env = (name * value) list
-
+(* type env = (name * value) list
+ *)
 let empty_env = []
 let extend x v env = (x, v) :: env
 
@@ -81,6 +81,14 @@ let rec eval_expr env e =
      | _ -> raise (EvalErr ("condition has type " ^ "int " ^ "but an expression was expected of type bool ")))
   | ELet (e1,e2,e3) ->
     (eval_expr ((e1,(eval_expr env e2))::env)  e3)
+  |EFun  (x,e)  -> VFun (x,e,env)
+  |EApp  (e1,e2) ->
+    let v1  = eval_expr env e1 in
+    let v2 = eval_expr env e2 in
+    (match v1 with
+    | VFun(x,e,oenv) ->
+      eval_expr (extend x v2 oenv) e
+    | _ -> raise (EvalErr "not function"))
 
 let rec eval_command env c =
   match c with

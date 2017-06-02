@@ -12,6 +12,7 @@
 %token EQ LT
 %token IF THEN ELSE
 %token LPAR RPAR
+%token FUN ARROW
 %token SEMISEMI
 
 %start toplevel
@@ -34,6 +35,7 @@ let_expr:
 expr:
   | LET var EQ expr IN expr             { ELet($2,$4,$6) }
   | IF expr THEN expr ELSE expr         { EIf($2,$4,$6) }
+  | FUN var ARROW expr                  { EFun($2,$4) }
   | bool_expr                           { $1 }
 ;
 
@@ -63,7 +65,13 @@ arith_expr:
 factor_expr:
   | factor_expr TIMES atomic_expr        { EMul($1,$3) }
   | factor_expr DIV atomic_expr          { EDiv($1,$3) }
-  | atomic_expr                          { $1 }
+  | app_expr                          { $1 }
+;
+
+app_expr:
+  | app_expr atomic_expr { EApp($1, $2) }
+  | atomic_expr          { $1 }
+
 ;
 
 atomic_expr:
