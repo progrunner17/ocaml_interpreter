@@ -88,7 +88,17 @@ let rec eval_expr env e =
     (match v1 with
     | VFun(x,e,oenv) ->
       eval_expr (extend x v2 oenv) e
+    | VRecFun(f,x,e,oenv) ->
+      let env' =
+        extend x v2  (extend f (VRecFun(f,x,e,oenv)) oenv)
+        in
+          eval_expr env' e
     | _ -> raise (EvalErr "not function"))
+    | ELetRec(f,x,e1,e2) ->
+        let env' =
+          extend f (VRecFun(f,x,e1,env)) env
+          in
+            eval_expr env' e2
 
 let rec eval_command env c =
   match c with
@@ -103,5 +113,6 @@ let rec eval_command env c =
                             print_newline ();
                           let (y,newenv,vy) = eval_command env next in
                           let vx = eval_expr env e in (y,(extend x vx newenv),vy))
+  | CRecDecl (f,x,e)   -> (f,(extend f (VRecFun(f,x,e,env)) env),VRecFun(f,x,e,env))
 
 
