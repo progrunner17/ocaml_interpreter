@@ -14,6 +14,7 @@ rule main = parse
 | "="          { Parser.EQ }
 | "<"          { Parser.LT }
 | "let"        { Parser.LET }
+| "rec"        { Parser.REC }
 | "in"         { Parser.IN }
 | "and"        { Parser.LETAND }
 | "if"         { Parser.IF }

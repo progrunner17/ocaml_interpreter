@@ -81,14 +81,18 @@ let rec eval_expr env e =
      | _ -> raise (EvalErr ("condition has type " ^ "int " ^ "but an expression was expected of type bool ")))
   | ELet (e1,e2,e3) ->
     (eval_expr ((e1,(eval_expr env e2))::env)  e3)
-  |EFun  (x,e)  -> VFun (x,e,env)
+  |EFun  (x,e)  -> VFun (x,e,ref env)
+  |ELetRec (f,x,e1,e2)->(
+      let oenv = ref [] in
+      let v = VFun(x,e1,oenv) in
+      (oenv := (extend f v env);(eval_expr !oenv e2))
+    )
   |EApp  (e1,e2) ->
-    let v1  = eval_expr env e1 in
-    let v2 = eval_expr env e2 in
-    (match v1 with
-    | VFun(x,e,oenv) ->
-      eval_expr (extend x v2 oenv) e
-    | _ -> raise (EvalErr "not function"))
+    (match  eval_expr env e1 with
+    |VFun(xx,ee,envenv) -> let x,e,oenv = xx,ee,envenv in
+      let v = eval_expr env e2 in
+      (oenv := (extend x v (!oenv))); eval_expr !oenv e
+    |_ -> raise  (EvalErr "func application error"))
 
 let rec eval_command env c =
   match c with
@@ -103,5 +107,6 @@ let rec eval_command env c =
                             print_newline ();
                           let (y,newenv,vy) = eval_command env next in
                           let vx = eval_expr env e in (y,(extend x vx newenv),vy))
-
-
+  | CRecDecl (f,x,e) -> let oenv = ref [] in
+                      oenv := extend f (VFun(x,e,oenv)) env;
+                        (f,!oenv,VFun(x,e,oenv))

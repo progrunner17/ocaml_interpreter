@@ -1,9 +1,9 @@
 type name = string
 and  env = (name * value) list
 and value =
-  | VInt  of int
-  | VBool of bool
-  | VFun  of name * expr * env
+  | VInt    of int
+  | VBool   of bool
+  | VFun    of name * expr * env ref
 and expr =
   | EConstInt  of int
   | EConstBool of bool
@@ -20,11 +20,14 @@ and expr =
   | ELet       of name * expr * expr
   | EFun       of name * expr
   | EApp       of expr * expr
+  | ELetRec    of name * name * expr * expr
 and command =
   | CExp  of expr
   | CDecl of name * expr
   | CMultiDecl of name * expr * command
   | CAndDecl of name * expr * command
+  | CRecDecl of name * name * expr
+
 
 let print_name = print_string
 
@@ -142,3 +145,8 @@ let rec print_command p =
                       print_string ":";
                       print_expr e2;
                       print_command e3)
+  | CRecDecl (id,x,e) ->
+     (print_string ("CRecDecl (" ^ id ^ "," ^ x ^ ",");
+      print_expr e;
+      print_string ")")
+
