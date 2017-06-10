@@ -4,6 +4,7 @@ and value =
   | VInt  of int
   | VBool of bool
   | VFun  of name * expr * env
+  | VDFun  of name * expr
   | VRecFun of name * (name * (name * expr)) list * env
 and expr =
   | EConstInt  of int
@@ -20,6 +21,7 @@ and expr =
   | EIf        of expr * expr * expr
   | ELet       of name * expr * expr
   | EFun       of name * expr
+  | EDFun      of name * expr
   | EApp       of expr * expr
   | ELetRec    of (name * (name * expr)) list * expr
 and command =
@@ -37,6 +39,7 @@ let print_value v =
   | VInt i  -> print_int i
   | VBool b -> print_string (string_of_bool b)
   | VFun (_,_,_) -> print_string "<fun>"
+  | VDFun (_,_) -> print_string "<dfun>"
   | VRecFun (_,_,_) -> print_string "<fun>"
 
 (*

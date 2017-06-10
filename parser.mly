@@ -12,7 +12,7 @@
 %token EQ LT
 %token IF THEN ELSE
 %token LPAR RPAR
-%token FUN ARROW
+%token FUN ARROW DFUN
 %token REC
 %token SEMISEMI
 %start toplevel
@@ -42,6 +42,7 @@ expr:
   | LET REC let_rec_expr IN expr        { ELetRec($3,$5) }
   | IF expr THEN expr ELSE expr         { EIf($2,$4,$6) }
   | FUN var ARROW expr                  { EFun($2,$4) }
+  | DFUN var ARROW expr                 { EDFun($2,$4) }
   | bool_expr                           { $1 }
 ;
 
