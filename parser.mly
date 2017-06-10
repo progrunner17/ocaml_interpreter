@@ -41,9 +41,13 @@ expr:
   | LET var EQ expr IN expr             { ELet($2,$4,$6) }
   | LET REC let_rec_expr IN expr        { ELetRec($3,$5) }
   | IF expr THEN expr ELSE expr         { EIf($2,$4,$6) }
-  | FUN var ARROW expr                  { EFun($2,$4) }
+  | FUN fun_expr                        { $2 }
   | bool_expr                           { $1 }
 ;
+
+fun_expr:
+  | ARROW expr                          {$2}
+  | var fun_expr                        { EFun($1,$2) }
 
 
 bool_expr:
