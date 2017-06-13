@@ -25,6 +25,7 @@ rule main = parse
 | "("          { Parser.LPAR }
 | ")"          { Parser.RPAR }
 | "fun"        { Parser.FUN}
+| "dfun"       { Parser.DFUN}
 | "->"         { Parser.ARROW }
 | ";;"         { Parser.SEMISEMI }
 | digit+ as n  { Parser.INT (int_of_string n) }

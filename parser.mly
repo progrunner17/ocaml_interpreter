@@ -12,7 +12,7 @@
 %token EQ LT
 %token IF THEN ELSE
 %token LPAR RPAR
-%token FUN ARROW
+%token FUN ARROW DFUN
 %token REC
 %token SEMISEMI
 %start toplevel
@@ -22,7 +22,7 @@
 toplevel:
   | expr SEMISEMI { CExp $1 }
   | LET let_expr SEMISEMI { $2 }
-  | LET REC let_rec_expr SEMISEMI { $3 }
+  | LET REC let_rec_expr SEMISEMI { CRecDecl($3) }
 
 ;
 
@@ -33,14 +33,16 @@ let_expr:
 ;
 
 let_rec_expr:
-  | var var EQ expr                     { CRecDecl ($1,$2,$4) }
+  | var var EQ expr                     { [($1,($2,$4))]}
+  | var var EQ expr  LETAND let_rec_expr   { ($1,($2,$4)) :: $6 }
 
 ;
 expr:
   | LET var EQ expr IN expr             { ELet($2,$4,$6) }
-  | LET REC var var EQ expr IN expr     { ELetRec($3,$4,$6,$8) }
+  | LET REC let_rec_expr IN expr        { ELetRec($3,$5) }
   | IF expr THEN expr ELSE expr         { EIf($2,$4,$6) }
   | FUN var ARROW expr                  { EFun($2,$4) }
+  | DFUN var ARROW expr                 { EDFun($2,$4) }
   | bool_expr                           { $1 }
 ;
 
