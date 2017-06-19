@@ -100,19 +100,20 @@ let rec eval_expr env e =
           in
             eval_expr env' e2
 
-let rec eval_command env c =
+
+
+
+
+let rec eval_command env tyenv c =
   match c with
-  | CExp e -> ("-", env, eval_expr env e)
-  | CDecl (e1,e2) -> (e1,((e1,(eval_expr env e2))::env),(eval_expr env e2))
-  | CMultiDecl(x,e,next) -> (Printf.printf "%s = " x;
-                            print_value (eval_expr env e);
-                            print_newline ();
-                         let v = eval_expr env e in (eval_command (extend x v env) next))
-  | CAndDecl (x,e,next) ->(Printf.printf "%s = " x;
-                            print_value (eval_expr env e);
-                            print_newline ();
-                          let (y,newenv,vy) = eval_command env next in
-                          let vx = eval_expr env e in (y,(extend x vx newenv),vy))
-  | CRecDecl (f,x,e)   -> (f,(extend f (VRecFun(f,x,e,env)) env),VRecFun(f,x,e,env))
+  | CExp e ->
+        let v = eval_expr env e in
+        ("-", env, v)
+  | CDecl (x,e) ->
+        let v = eval_expr env e in
+        ("val " ^ x, (extend x v env), v)
+  | CRecDecl (f,x,e)   ->
+        let v = VRecFun(f,x,e,env) in
+        ("val " ^ f, (extend f v env), v)
 
 
