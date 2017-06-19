@@ -20,25 +20,17 @@
 %%
 
 toplevel:
-  | expr SEMISEMI { CExp $1 }
-  | LET var EQ expr SEMISEMI { CDecl ($2, $4) }
-  | LET REC var var EQ expr SEMISEMI { CRecDecl ($3,$4,$6) }
-;
-
-
-let_expr:
-  | var EQ expr LET let_expr            { CMultiDecl($1,$3,$5) }
-  | var EQ expr LETAND let_expr         { CAndDecl($1,$3,$5) }
-  | var EQ expr                         { CDecl ($1, $3) }
+  | expr SEMISEMI                       { CExp $1 }
+  | LET var EQ expr SEMISEMI            { CDecl ($2, $4) }
+  | LET REC var var EQ expr SEMISEMI    { CRecDecl ($3,$4,$6) }
 ;
 
 
 expr:
   | LET var EQ expr IN expr             { ELet($2,$4,$6) }
-  | LET REC let_rec_expr IN expr        { ELetRec($3,$5) }
+  | LET REC var var EQ expr IN expr     { ELetRec($3,$4,$6,$8) }
   | IF expr THEN expr ELSE expr         { EIf($2,$4,$6) }
   | FUN var ARROW expr                  { EFun($2,$4) }
-  | DFUN var ARROW expr                 { EDFun($2,$4) }
   | bool_expr                           { $1 }
 ;
 
