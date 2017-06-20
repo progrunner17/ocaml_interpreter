@@ -12,7 +12,7 @@ let extend x v env = (x, v) :: env
 let rec lookup x env =
   try List.assoc x env with Not_found -> raise Unbound
 
-exception InferErr
+exception InferErr of string
 
 
 let rec infer_expr tyenv e =(*reurn ty * const*)
@@ -25,36 +25,16 @@ let rec infer_expr tyenv e =(*reurn ty * const*)
     (try
        ((lookup x tyenv),[])
      with
-     | Unbound -> raise InferErr)
-  | EAdd (e1,e2) ->(
+     | Unbound -> raise (InferErr ("Unbound value " ^ x)))
+  | EAdd (e1,e2) | ESub (e1,e2) | EMul (e1,e2) | EDiv (e1,e2) | EMod(e1,e2) ->(
     let (t1,c1) = infer_expr tyenv e1 in
     let (t2,c2) = infer_expr tyenv e2 in
       (TyInt,[(t1,TyInt);(t2,TyInt)]@c1@c2))
-  | ESub (e1,e2) ->(
-    let (t1,c1) = infer_expr tyenv e1 in
-    let (t2,c2) = infer_expr tyenv e2 in
-      (TyInt,[(t1,TyInt);(t2,TyInt)]@c1@c2))
-  | EMul (e1,e2) ->(
-    let (t1,c1) = infer_expr tyenv e1 in
-    let (t2,c2) = infer_expr tyenv e2 in
-      (TyInt,[(t1,TyInt);(t2,TyInt)]@c1@c2))
-  | EDiv (e1,e2) ->(
-    let (t1,c1) = infer_expr tyenv e1 in
-    let (t2,c2) = infer_expr tyenv e2 in
-      (TyInt,[(t1,TyInt);(t2,TyInt)]@c1@c2))
-  | EAnd (e1,e2) ->(
+  | EAnd(e1,e2) | EOr(e1,e2) ->(
     let (t1,c1) = infer_expr tyenv e1 in
     let (t2,c2) = infer_expr tyenv e2 in
       (TyBool,[(t1,TyBool);(t2,TyBool)]@c1@c2))
-  | EOr (e1,e2) ->(
-    let (t1,c1) = infer_expr tyenv e1 in
-    let (t2,c2) = infer_expr tyenv e2 in
-      (TyBool,[(t1,TyBool);(t2,TyBool)]@c1@c2))
-  | EEq (e1,e2) ->(
-    let (t1,c1) = infer_expr tyenv e1 in
-    let (t2,c2) = infer_expr tyenv e2 in
-      (TyBool,[(t1,t2)]@c1@c2))
-  | ELt (e1,e2) ->(
+  | EEq(e1,e2) |ELt(e1,e2) |ELe(e1,e2) |EGt(e1,e2) |EGe(e1,e2) ->(
     let (t1,c1) = infer_expr tyenv e1 in
     let (t2,c2) = infer_expr tyenv e2 in
       (TyBool,[(t1,t2)]@c1@c2))
@@ -100,6 +80,7 @@ let rec infer_command tyenv cmd =
         let a = TyVar(new_tyvar ()) in
         let b = TyVar(new_tyvar ()) in
         let (t,c) = infer_expr (extend f (TyFun(a,b)) (extend x a tyenv)) e in
-        let ft = (ty_subst (unify c) t) in
-        ft, (extend x ft tyenv)
-  with TyError -> raise InferErr
+        let ft = ty_subst (unify ((t,b)::c)) (TyFun(a,b)) in
+        ft, (extend f ft tyenv)
+  with TyError -> raise (InferErr "InferErr")
+

@@ -9,10 +9,14 @@ rule main = parse
 | "*"          { Parser.TIMES }
 | "-"          { Parser.MINUS }
 | "/"          { Parser.DIV }
+| "mod"        { Parser.MOD }
 | "&&"         { Parser.AND }
 | "||"         { Parser.OR }
 | "="          { Parser.EQ }
 | "<"          { Parser.LT }
+| "<="         { Parser.LE }
+| ">"          { Parser.GT }
+| ">="         { Parser.GE }
 | "let"        { Parser.LET }
 | "rec"        { Parser.REC }
 | "in"         { Parser.IN }

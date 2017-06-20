@@ -46,6 +46,12 @@ let rec eval_expr env e =
     (match v1, v2 with
      | VInt i1, VInt i2 -> VInt (i1 / i2)
      | _ -> raise (EvalErr "argments has differlent type"))
+  | EMod (e1,e2) ->
+    let v1 = eval_expr env e1 in
+    let v2 = eval_expr env e2 in
+    (match v1, v2 with
+     | VInt i1, VInt i2 -> VInt (i1 mod i2)
+     | _ -> raise (EvalErr "argments has differlent type"))
   | EAnd (e1,e2) ->
     let v1 = eval_expr env e1 in
     let v2 = eval_expr env e2 in
@@ -71,6 +77,27 @@ let rec eval_expr env e =
     (match v1, v2 with
      | VInt i1,  VInt i2  -> VBool (i1 < i2)
      | VBool i1,  VBool i2  -> VBool (i1 < i2)
+     | _ -> raise (EvalErr "argments has differlent type"))
+  | ELe (e1,e2) ->
+    let v1 = eval_expr env e1 in
+    let v2 = eval_expr env e2 in
+    (match v1, v2 with
+     | VInt i1,  VInt i2  -> VBool (i1 <= i2)
+     | VBool i1,  VBool i2  -> VBool (i1 <= i2)
+     | _ -> raise (EvalErr "argments has differlent type"))
+  | EGt (e1,e2) ->
+    let v1 = eval_expr env e1 in
+    let v2 = eval_expr env e2 in
+    (match v1, v2 with
+     | VInt i1,  VInt i2  -> VBool (i1 > i2)
+     | VBool i1,  VBool i2  -> VBool (i1 > i2)
+     | _ -> raise (EvalErr "argments has differlent type"))
+  | EGe (e1,e2) ->
+    let v1 = eval_expr env e1 in
+    let v2 = eval_expr env e2 in
+    (match v1, v2 with
+     | VInt i1,  VInt i2  -> VBool (i1 >= i2)
+     | VBool i1,  VBool i2  -> VBool (i1 >= i2)
      | _ -> raise (EvalErr "argments has differlent type"))
   | EIf (e1,e2,e3) ->
     let v1 = eval_expr env e1 in

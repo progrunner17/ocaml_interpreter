@@ -5,7 +5,6 @@ and value =
   | VInt  of int
   | VBool of bool
   | VFun  of name * expr * env
-  | VDFun  of name * expr
   | VRecFun of name * name * expr * env
 and expr =
   | EConstInt  of int
@@ -15,10 +14,14 @@ and expr =
   | ESub       of expr * expr
   | EMul       of expr * expr
   | EDiv       of expr * expr
+  | EMod       of expr * expr
   | EAnd       of expr * expr
   | EOr        of expr * expr
   | EEq        of expr * expr
   | ELt        of expr * expr
+  | ELe        of expr * expr
+  | EGt        of expr * expr
+  | EGe        of expr * expr
   | EIf        of expr * expr * expr
   | ELet       of name * expr * expr
   | EFun       of name * expr
@@ -37,7 +40,6 @@ let print_value v =
   | VInt i  -> print_int i
   | VBool b -> print_string (string_of_bool b)
   | VFun (_,_,_) -> print_string "<fun>"
-  | VDFun (_,_) -> print_string "<dfun>"
   | VRecFun (_,_,_,_) -> print_string "<fun>"
 
 (*
@@ -78,6 +80,12 @@ let rec  print_expr e =
       print_string ",";
       print_expr e2;
       print_string ")")
+  | EMod (e1,e2) ->
+     (print_string "EMod (";
+      print_expr e1;
+      print_string ",";
+      print_expr e2;
+      print_string ")")
   | EAnd (e1,e2) ->
      (print_string "EAnd (";
       print_expr e1;
@@ -97,6 +105,24 @@ let rec  print_expr e =
       print_expr e2;
       print_string ")")
   | ELt (e1, e2) ->
+     (print_string "ELt (";
+      print_expr e1;
+      print_string ",";
+      print_expr e2;
+      print_string ")")
+  | ELe (e1, e2) ->
+     (print_string "ELe (";
+      print_expr e1;
+      print_string ",";
+      print_expr e2;
+      print_string ")")
+  | EGt (e1, e2) ->
+     (print_string "ELt (";
+      print_expr e1;
+      print_string ",";
+      print_expr e2;
+      print_string ")")
+  | EGe (e1, e2) ->
      (print_string "ELt (";
       print_expr e1;
       print_string ",";
@@ -139,6 +165,7 @@ let rec  print_expr e =
     print_expr e1;
     print_string " in ";
     print_expr e2)
+
 
 let rec print_command p =
   match p with
