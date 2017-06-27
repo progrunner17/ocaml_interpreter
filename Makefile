@@ -1,6 +1,6 @@
-SOURCES = syntax.ml lexer.mll parser.mly infer.ml eval.ml main.ml
+SOURCES = syntax.ml lexer.mll parser.mly  tySyntax.mli tySyntax.ml  constraintSolver.mli constraintSolver.ml infer.ml eval.ml main.ml
 RESULT  = my_ocaml
-LIBS	= tySyntax constraintSolver
+# LIBS	= tySyntax constraintSolver
 YFLAGS = -v
 
 all: byte-code byte-code-library

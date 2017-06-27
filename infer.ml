@@ -82,5 +82,5 @@ let rec infer_command tyenv cmd =
         let (t,c) = infer_expr (extend f (TyFun(a,b)) (extend x a tyenv)) e in
         let ft = ty_subst (unify ((t,b)::c)) (TyFun(a,b)) in
         ft, (extend f ft tyenv)
-  with TyError -> raise (InferErr "InferErr")
+  with TyError str -> raise (InferErr ("Infer Error :" ^ str))
 
