@@ -1,6 +1,7 @@
 open Syntax
 
 exception Unbound
+exception MatchErr
 
 let empty_env = []
 
@@ -10,6 +11,17 @@ let rec lookup x env =
   try List.assoc x env with Not_found -> raise Unbound
 
 exception EvalErr of string
+
+
+let rec find_match v p env=
+  match v,p with
+  | VInt(_),PInt(_)|VBool(_),PBool(_)->Some []
+  | x,PVar(id) -> Some ((id,x)::[])
+  | VPair(v1,v2),PPair(p1,p2)->(match (find_match v1 p1 env),(find_match v2 p2 env) with (Some l1),(Some l2)->Some (l1@l2)|_,_->None)
+  | VNil,PNil-> Some []
+  | VCons(v1,v2),PCons(p1,p2)->(match (find_match v1 p1 env),(find_match v2 p2 env) with (Some l1),(Some l2)->Some (l1@l2)|_,_->None)
+  | _,_ -> None
+
 
 let rec eval_expr env e =
   match e with
@@ -122,6 +134,25 @@ let rec eval_expr env e =
           let env' = extend f (VRecFun(f,x,e,env)) env
           in
             eval_expr env' e2)
+  | EPair(e1,e2) ->(
+    let v1 = eval_expr env e1 in
+    let v2 = eval_expr env e2 in
+    (VPair(v1,v2)))
+  | ENil-> VNil
+  | ECons(e1,e2)->(
+      let v1 = eval_expr env e1 in
+      let v2 = eval_expr env e2 in
+      (VCons(v1,v2)))
+  |EMatch(e,cases)->(
+    let v = eval_expr env e in
+    match cases with
+    | [] -> raise MatchErr
+    | (pn,en)::cases' -> (match find_match v pn  env with
+      | Some(ls) -> (eval_expr (ls @ env) en)
+      | None -> eval_expr env (EMatch(e,cases'))))
+
+
+
 
 
 let rec eval_command env c =

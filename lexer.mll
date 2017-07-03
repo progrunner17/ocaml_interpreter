@@ -31,6 +31,13 @@ rule main = parse
 | "fun"        { Parser.FUN}
 | "dfun"       { Parser.DFUN}
 | "->"         { Parser.ARROW }
+| "["          { Parser.LBRACKET }
+| "]"          { Parser.RBRACKET }
+| "::"         { Parser.CONS }
+| ","          { Parser.COMMA }
+| "match"      { Parser.MATCH }
+| "with"       { Parser.WITH }
+| "|"          { Parser.BAR }
 | ";;"         { Parser.SEMISEMI }
 | digit+ as n  { Parser.INT (int_of_string n) }
 | ident  as id { Parser.ID id }

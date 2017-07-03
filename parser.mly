@@ -14,6 +14,8 @@
 %token LPAR RPAR
 %token FUN ARROW DFUN
 %token REC
+%token LBRACKET RBRACKET CONS COMMA
+%token MATCH WITH BAR
 %token SEMISEMI
 %start toplevel
 %type <Syntax.command> toplevel
@@ -36,8 +38,37 @@ expr:
   | LET REC var var EQ expr IN expr     { ELetRec($3,$4,$6,$8) }
   | IF expr THEN expr ELSE expr         { EIf($2,$4,$6) }
   | FUN fun_abbr                        { $2 }
-  | bool_expr                           { $1 }
+  | MATCH expr WITH cases               { EMatch($2, $4) }
+  | MATCH expr WITH BAR cases           { EMatch($2, $5) }
+  | list_expr                           { $1 }
 ;
+
+
+cases:
+  | pattern ARROW expr           { [($1, $3)] }
+  | pattern ARROW expr BAR cases { ($1, $3) :: $5 }
+;
+
+
+pattern:
+  | atomic_pattern CONS pattern      { PCons($1,$3) }
+  | atomic_pattern                   { $1 }
+;
+
+atomic_pattern:
+  | INT                              { PInt($1) }
+  | BOOL                             { PBool($1) }
+  | var                              { PVar($1) }
+  | LPAR pattern COMMA pattern RPAR  { PPair($2, $4) }
+  | LBRACKET RBRACKET                { PNil }
+  | LPAR pattern RPAR                { $2 }
+;
+
+list_expr:
+  | bool_expr CONS list_expr { ECons($1, $3) }
+  | bool_expr                { $1 }
+;
+
 
 fun_abbr:
   |var ARROW expr                        { EFun($1,$3) }
@@ -80,12 +111,14 @@ factor_expr:
 app_expr:
   | app_expr atomic_expr { EApp($1, $2) }
   | atomic_expr          { $1 }
-
 ;
+
 
 atomic_expr:
   | INT                                  { EConstInt($1) }
   | BOOL                                 { EConstBool($1) }
+  | LPAR expr COMMA expr RPAR            { EPair($2, $4) }
+  | LBRACKET RBRACKET                    { ENil }
   | ID                                   { EVar($1) }
   | LPAR expr RPAR                       { $2 }
 ;

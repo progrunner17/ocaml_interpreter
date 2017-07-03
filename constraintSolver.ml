@@ -111,16 +111,6 @@ let rec unify constraints =
 		| _,_ ->raise (TyError "match error") )
 
 
-
-
-
-
-
-
-
-
-
-
 (*
 ** @func 	ty_subst
 ** @arg 	subst
