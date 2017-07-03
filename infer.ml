@@ -15,6 +15,20 @@ let rec lookup x env =
 exception InferErr of string
 
 
+let rec infer_pattern p =
+  match p with
+  | PInt(_) -> (TyInt,[],[])
+  | PBool(_) -> (TyBool,[],[])
+  | PVar(x) -> let a = TyVar(new_tyvar ()) in (a,[],[(x,a)])
+  | PPair(p1,p2) -> (let t1,c1,r1 = infer_pattern p1 in
+                      let t2,c2,r2 = infer_pattern p2 in
+                      (TyPair(t1,t2),c1@c2,r1@r2))
+  | PNil -> (TyList(TyVar(new_tyvar ())),[],[])
+  | PCons(p1,p2) -> (let t1,c1,r1 = infer_pattern p1 in
+                     let t2,c2,r2 = infer_pattern p2 in
+                     (TyList(t1),(TyList(t1),t2)::c1@c2,r1@r2))
+
+
 let rec infer_expr tyenv e =(*reurn ty * const*)
   match e with
   | EConstInt i ->
@@ -62,6 +76,28 @@ let rec infer_expr tyenv e =(*reurn ty * const*)
     let (t1,c1) = infer_expr (extend f (TyFun(a,b)) (extend x a tyenv)) e1 in
     let (t2,c2) = infer_expr (extend f (TyFun(a,b)) tyenv) e2 in
       (t2,(t1,b)::c1@c2)
+  | EPair(e1,e2) ->(
+    let (t1,c1) = infer_expr tyenv e1 in
+    let (t2,c2) = infer_expr tyenv e2 in
+    (TyPair(t1,t2),c1@c2))
+  | ENil->(
+      let a = TyVar(new_tyvar ()) in
+      (TyList(a),[]))
+  | ECons(e1,e2)->(
+      let (t1,c1) = infer_expr tyenv e1 in
+      let (t2,c2) = infer_expr tyenv e2 in
+      (t2,(TyList(t1),t2)::c1@c2))
+  | EMatch(e,cases)->(
+      let (t,c) = infer_expr tyenv e in
+      let a = TyVar(new_tyvar ()) in
+      let f (pi,ei) = (let ti,ci,ri = infer_pattern pi in
+                    (let ti',ci' = infer_expr (ri@tyenv) ei in
+                    ((t,ti)::(a,ti')::ci@(ci')))) in
+      (a,((List.concat (List.map f cases)) @ c)))
+
+
+
+
 
 
 

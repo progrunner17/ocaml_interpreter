@@ -50,6 +50,8 @@ let rec update_ty old_ty new_ty ty=
 	match ty with
 	| x  when x = old_ty -> new_ty
 	| TyFun(t1,t2) -> TyFun((update_ty old_ty new_ty t1),(update_ty old_ty new_ty t2))
+	| TyPair(t1,t2) ->TyPair((update_ty old_ty new_ty t1),(update_ty old_ty new_ty t2))
+	| TyList(t) ->TyList((update_ty old_ty new_ty t))
 	| _ ->ty
 
 let rec update_subst old_ty new_ty subst =
@@ -69,7 +71,7 @@ let rec compose subst_f subst_g =
 	match subst_g with
 	|[] -> subst_f
 	|(tyvar,ty)::subst-> match ty with
-		|TyInt | TyBool | TyFun(_,_) -> (tyvar,ty)::(compose (update_subst (TyVar(tyvar)) ty subst_f) (update_subst (TyVar(tyvar)) ty subst))
+		|TyInt | TyBool | TyFun(_,_) |TyPair(_,_)|TyList(_) -> (tyvar,ty)::(compose (update_subst (TyVar(tyvar)) ty subst_f) (update_subst (TyVar(tyvar)) ty subst))
 		|TyVar(tyvarf) ->(tyvar,(update_ty (TyVar(tyvar)) ty (lookup_ty subst_f tyvarf)))::(compose (update_subst (TyVar(tyvar)) ty subst_f) subst)
 
 
@@ -105,6 +107,8 @@ let rec unify constraints =
 	|(ty1,ty2)::constraints'->(match ty1,ty2 with
 		| TyInt,TyInt | TyBool,TyBool -> (unify constraints')
 		| (TyFun(t11,t12),TyFun(t21,t22)) -> (unify ([(t11,t21);(t12,t22)] @ constraints'))
+		| (TyPair(t11,t12),TyPair(t21,t22)) -> (unify ([(t11,t21);(t12,t22)] @ constraints'))
+		| (TyList(t1),TyList(t2))-> (unify ((t1,t2)::constraints'))
 		| (ty,TyVar(tyvar))| (TyVar(tyvar),ty)  ->
 				if (TyVar(tyvar)) = ty then (unify constraints') else
 				(let tty = (occurence_detect  tyvar ty) in (compose [(tyvar,tty)] (unify (update (TyVar(tyvar)) tty constraints')) ))
@@ -135,6 +139,8 @@ let rec ty_subst subst ty =
 					 print_type (lookup_ty subst tyvar);
 					 print_newline (); *)
 					 (lookup_ty subst tyvar)
+	| TyPair(t1,t2) -> TyPair((ty_subst subst t1),(ty_subst subst t2))
+	| TyList(t)     -> TyList(ty_subst subst t)
 
 
 
